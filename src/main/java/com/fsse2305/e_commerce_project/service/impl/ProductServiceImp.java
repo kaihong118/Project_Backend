@@ -44,6 +44,7 @@ public class ProductServiceImp implements ProductService {
         }
     }
 
+    @Override
     public ProductEntity findProductByPid(Integer pid) {
         ProductEntity productEntity = productRepository.findProductByPid(pid);
 
