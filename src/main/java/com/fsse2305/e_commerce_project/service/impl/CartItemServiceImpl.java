@@ -5,6 +5,8 @@ import com.fsse2305.e_commerce_project.data.cart_Item.entity.CartItemEntity;
 import com.fsse2305.e_commerce_project.data.product.entity.ProductEntity;
 import com.fsse2305.e_commerce_project.data.user.domainObject.FirebaseUserData;
 import com.fsse2305.e_commerce_project.data.user.entity.UserEntity;
+import com.fsse2305.e_commerce_project.exception.cartItem.CartItemNotFoundException;
+import com.fsse2305.e_commerce_project.exception.cartItem.CartItemQuantityException;
 import com.fsse2305.e_commerce_project.exception.cartItem.NoStockException;
 import com.fsse2305.e_commerce_project.exception.product.ProductNotFoundException;
 import com.fsse2305.e_commerce_project.repository.CartItemRepository;
@@ -15,7 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -64,6 +69,50 @@ public class CartItemServiceImpl implements CartItemService {
         catch(ProductNotFoundException ex) {
             logger.warn("Add Cart Item API: Product Not Found " + pid);
             throw ex;
+        }
+    }
+
+    @Override
+    public List<CartItemDetailData> getCartItemByUser(FirebaseUserData firebaseUserData) {
+        UserEntity currentUser = getUserEntity(firebaseUserData);
+        List<CartItemDetailData> cartItemDetailDataList = new ArrayList<>();
+
+        for(CartItemEntity cartItemEntity : cartItemRepository.findCartItemByUser(currentUser)) {
+            cartItemDetailDataList.add(new CartItemDetailData(cartItemEntity));
+        }
+        return cartItemDetailDataList;
+    }
+
+    @Override
+    @Transactional
+    public CartItemDetailData updateCartItem(FirebaseUserData firebaseUserData, Integer pid, Integer quantity) {
+        UserEntity currentUser = getUserEntity(firebaseUserData);
+        Optional<CartItemEntity> optionalCartItemEntity = cartItemRepository.findCartItemByUserAndProductPid(currentUser, pid);
+
+        if(optionalCartItemEntity.isEmpty()) {
+            logger.warn("Update Cart Item API: Cart Item Not Found " + pid);
+            throw new CartItemNotFoundException();
+        }
+        else {
+            CartItemEntity cartItemEntity = optionalCartItemEntity.get();
+            if(quantity < 0) {
+                logger.warn("Update Cart Item Quantity API: Quantity is less than 0 " + quantity);
+                throw new CartItemQuantityException();
+            }
+            if(quantity == 0) {
+                cartItemRepository.delete(cartItemEntity);
+                cartItemEntity.setQuantity(0);
+                return new CartItemDetailData(cartItemEntity);
+            }
+            if(checkStock(cartItemEntity.getProduct(), quantity)) {
+                cartItemEntity.setQuantity(quantity);
+                cartItemRepository.save(cartItemEntity);
+                return new CartItemDetailData(cartItemEntity);
+            }
+            else {
+                logger.warn("Update Cart Item API: No Stock Available " + quantity);
+                throw new NoStockException();
+            }
         }
     }
 

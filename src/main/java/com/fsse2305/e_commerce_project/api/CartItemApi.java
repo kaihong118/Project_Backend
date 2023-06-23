@@ -1,15 +1,17 @@
 package com.fsse2305.e_commerce_project.api;
 
 import com.fsse2305.e_commerce_project.data.cart_Item.domainObject.CartItemDetailData;
-import com.fsse2305.e_commerce_project.data.cart_Item.dto.response.CartItemStatusDto;
+import com.fsse2305.e_commerce_project.data.cart_Item.dto.response.CartItemDetailResponseDto;
+import com.fsse2305.e_commerce_project.data.cart_Item.dto.response.CartItemStatusResponseDto;
+import com.fsse2305.e_commerce_project.data.user.domainObject.FirebaseUserData;
 import com.fsse2305.e_commerce_project.service.CartItemService;
 import com.fsse2305.e_commerce_project.uility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/cart")
@@ -22,10 +24,29 @@ public class CartItemApi {
     }
 
     @PutMapping("/{pid}/{quantity}")
-    public CartItemStatusDto addCartItem(JwtAuthenticationToken jwtToken,
-                                         @PathVariable(value = "pid") Integer pid,
-                                         @PathVariable(value = "quantity") Integer quantity) {
-        CartItemDetailData cartItemDetailData = cartItemService.AddCartItem(JwtUtil.getFirebaseUserData(jwtToken), pid, quantity);
-        return new CartItemStatusDto();
+    public CartItemStatusResponseDto addCartItem(JwtAuthenticationToken jwtToken,
+                                                 @PathVariable(value = "pid") Integer pid,
+                                                 @PathVariable(value = "quantity") Integer quantity) {
+        cartItemService.AddCartItem(JwtUtil.getFirebaseUserData(jwtToken), pid, quantity);
+        return new CartItemStatusResponseDto();
+    }
+
+    @GetMapping()
+    public List<CartItemDetailResponseDto> getCartItemByUser(JwtAuthenticationToken jwtToken) {
+        FirebaseUserData firebaseUserData = JwtUtil.getFirebaseUserData(jwtToken);
+        List<CartItemDetailResponseDto> cartItemDetailResponseDtoList = new ArrayList<>();
+
+        for(CartItemDetailData cartItemDetailData : cartItemService.getCartItemByUser(firebaseUserData)) {
+            cartItemDetailResponseDtoList.add(new CartItemDetailResponseDto(cartItemDetailData));
+        }
+        return cartItemDetailResponseDtoList;
+    }
+
+    @PatchMapping("/{pid}/{quantity}")
+    public CartItemDetailResponseDto updateCartItem(JwtAuthenticationToken jwtToken,
+                                                    @PathVariable(value = "pid") Integer pid,
+                                                    @PathVariable(value = "quantity") Integer quantity) {
+        FirebaseUserData firebaseUserData = JwtUtil.getFirebaseUserData(jwtToken);
+        return new CartItemDetailResponseDto(cartItemService.updateCartItem(firebaseUserData, pid, quantity));
     }
 }
