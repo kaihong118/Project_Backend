@@ -2,6 +2,7 @@ package com.fsse2305.e_commerce_project.data.product.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fsse2305.e_commerce_project.data.product.domainObject.ProductDetailData;
+import com.fsse2305.e_commerce_project.data.transaction_product.domainObject.TransactionProductDetailData;
 
 import java.math.BigDecimal;
 
@@ -31,5 +32,14 @@ public class ProductDetailDto {
         this.imageUrl = productDetailData.getImageUrl();
         this.price = productDetailData.getPrice();
         this.stock = productDetailData.getStock();
+    }
+
+    public ProductDetailDto(TransactionProductDetailData transactionProductDetailData) {
+        this.pid = transactionProductDetailData.getPid();
+        this.name = transactionProductDetailData.getName();
+        this.description = transactionProductDetailData.getDescription();
+        this.imageUrl = transactionProductDetailData.getImageUrl();
+        this.price = transactionProductDetailData.getPrice();
+        this.stock = transactionProductDetailData.getStock();
     }
 }

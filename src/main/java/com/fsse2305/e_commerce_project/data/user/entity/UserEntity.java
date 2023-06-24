@@ -4,7 +4,7 @@ import com.fsse2305.e_commerce_project.data.user.domainObject.FirebaseUserData;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "user", indexes = @Index(name = "firebase_url", columnList = "firebase_url"))
+@Table(name = "user", indexes = @Index(name = "firebase_uid", columnList = "firebase_uid"))
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,7 +13,7 @@ public class UserEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column(name = "firebase_url", nullable = false,unique = true)
+    @Column(name = "firebase_uid", nullable = false, unique = true)
     private String firebaseUid;
 
     public UserEntity() {

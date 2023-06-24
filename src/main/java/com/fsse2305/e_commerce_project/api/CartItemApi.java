@@ -49,4 +49,11 @@ public class CartItemApi {
         FirebaseUserData firebaseUserData = JwtUtil.getFirebaseUserData(jwtToken);
         return new CartItemDetailResponseDto(cartItemService.updateCartItem(firebaseUserData, pid, quantity));
     }
+
+    @DeleteMapping("/{pid}")
+    public CartItemStatusResponseDto deleteCartItem(JwtAuthenticationToken jwtToken,
+                                                    @PathVariable(value = "pid") Integer pid) {
+        cartItemService.deleteCartItem(JwtUtil.getFirebaseUserData(jwtToken), pid);
+        return new CartItemStatusResponseDto();
+    }
 }

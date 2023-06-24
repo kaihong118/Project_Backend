@@ -116,6 +116,27 @@ public class CartItemServiceImpl implements CartItemService {
         }
     }
 
+    @Override
+    @Transactional
+    public CartItemDetailData deleteCartItem(FirebaseUserData firebaseUserData, Integer pid) {
+        UserEntity currentUser = getUserEntity(firebaseUserData);
+        Optional<CartItemEntity> optionalCartItemEntity = cartItemRepository.findCartItemByUserAndProductPid(currentUser, pid);
+
+        if(optionalCartItemEntity.isEmpty()) {
+            logger.warn("Delete Cart Item API: Cart Item Not Found " + pid);
+            throw new CartItemNotFoundException();
+        }
+        CartItemEntity cartItemEntity = optionalCartItemEntity.get();
+        cartItemRepository.delete(cartItemEntity);
+        return new CartItemDetailData(cartItemEntity);
+    }
+
+    @Override //Check!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    public List<CartItemEntity> findCartItemByUser(UserEntity userEntity) {
+        return cartItemRepository.findCartItemByUser(userEntity);
+    }
+
+    @Override
     public boolean checkStock(ProductEntity productEntity, Integer quantity) {
         return quantity <= productEntity.getStock() && productEntity.getStock() != 0;
     }
