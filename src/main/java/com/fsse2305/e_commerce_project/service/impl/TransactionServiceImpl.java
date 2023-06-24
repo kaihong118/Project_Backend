@@ -136,7 +136,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public TransactionEntity findTransactionByUserAndTid(UserEntity userEntity, Integer tid) {
-        TransactionEntity transactionEntity = transactionRepository.findTransactionByUserAndTid(userEntity, tid);
+        TransactionEntity transactionEntity = transactionRepository.findTransactionByUserUidAndTid(userEntity.getUid(), tid);
         if(transactionEntity == null) {
             throw new TransactionNotFoundException();
         }

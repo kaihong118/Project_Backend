@@ -42,7 +42,7 @@ public class CartItemServiceImpl implements CartItemService {
         try {
             UserEntity currentUser = getUserEntity(firebaseUserData);
             ProductEntity addItem = productService.findProductByPid(pid);
-            Optional<CartItemEntity> optionalCartItemEntity = cartItemRepository.findCartItemByUserAndProductPid(currentUser, pid);
+            Optional<CartItemEntity> optionalCartItemEntity = cartItemRepository.findCartItemByUserUidAndProductPid(currentUser.getUid(), pid);
 
             if(optionalCartItemEntity.isEmpty()) {
                 if(checkStock(addItem, quantity)) {
@@ -87,7 +87,7 @@ public class CartItemServiceImpl implements CartItemService {
     @Transactional
     public CartItemDetailData updateCartItem(FirebaseUserData firebaseUserData, Integer pid, Integer quantity) {
         UserEntity currentUser = getUserEntity(firebaseUserData);
-        Optional<CartItemEntity> optionalCartItemEntity = cartItemRepository.findCartItemByUserAndProductPid(currentUser, pid);
+        Optional<CartItemEntity> optionalCartItemEntity = cartItemRepository.findCartItemByUserUidAndProductPid(currentUser.getUid(), pid);
 
         if(optionalCartItemEntity.isEmpty()) {
             logger.warn("Update Cart Item API: Cart Item Not Found " + pid);
@@ -120,7 +120,7 @@ public class CartItemServiceImpl implements CartItemService {
     @Transactional
     public CartItemDetailData deleteCartItem(FirebaseUserData firebaseUserData, Integer pid) {
         UserEntity currentUser = getUserEntity(firebaseUserData);
-        Optional<CartItemEntity> optionalCartItemEntity = cartItemRepository.findCartItemByUserAndProductPid(currentUser, pid);
+        Optional<CartItemEntity> optionalCartItemEntity = cartItemRepository.findCartItemByUserUidAndProductPid(currentUser.getUid(), pid);
 
         if(optionalCartItemEntity.isEmpty()) {
             logger.warn("Delete Cart Item API: Cart Item Not Found " + pid);
@@ -133,7 +133,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public List<CartItemEntity> findCartItemByUser(UserEntity userEntity) {
-        return cartItemRepository.findCartItemByUser(userEntity);
+        return cartItemRepository.findCartItemByUserUid(userEntity.getUid());
     }
 
     @Override
