@@ -77,7 +77,7 @@ public class CartItemServiceImpl implements CartItemService {
         UserEntity currentUser = getUserEntity(firebaseUserData);
         List<CartItemDetailData> cartItemDetailDataList = new ArrayList<>();
 
-        for(CartItemEntity cartItemEntity : cartItemRepository.findCartItemByUser(currentUser)) {
+        for(CartItemEntity cartItemEntity : findCartItemByUser(currentUser)) {
             cartItemDetailDataList.add(new CartItemDetailData(cartItemEntity));
         }
         return cartItemDetailDataList;
@@ -131,7 +131,7 @@ public class CartItemServiceImpl implements CartItemService {
         return new CartItemDetailData(cartItemEntity);
     }
 
-    @Override //Check!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    @Override
     public List<CartItemEntity> findCartItemByUser(UserEntity userEntity) {
         return cartItemRepository.findCartItemByUser(userEntity);
     }
