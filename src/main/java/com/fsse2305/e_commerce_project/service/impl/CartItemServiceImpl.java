@@ -141,6 +141,11 @@ public class CartItemServiceImpl implements CartItemService {
         return quantity <= productEntity.getStock() && productEntity.getStock() != 0;
     }
 
+    @Override
+    public void emptyCartItem(UserEntity userEntity) {
+        cartItemRepository.deleteAll(findCartItemByUser(userEntity));
+    }
+
     public UserEntity getUserEntity(FirebaseUserData firebaseUserData) {
         return userService.getUserByFirebaseUserDetail(firebaseUserData);
     }

@@ -22,4 +22,6 @@ public interface CartItemService {
     List<CartItemEntity> findCartItemByUser(UserEntity userEntity);
 
     boolean checkStock(ProductEntity productEntity, Integer quantity);
+
+    void emptyCartItem(UserEntity userEntity);
 }

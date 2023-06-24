@@ -112,6 +112,29 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+    @Override
+    public TransactionDetailData completeTransactionByTid(FirebaseUserData firebaseUserData, Integer tid) {
+        try {
+            UserEntity currentUser = getUserEntity(firebaseUserData);
+            TransactionEntity transactionEntity = findTransactionByUserAndTid(currentUser, tid);
+
+            if(transactionEntity.getStatus().equals(TransactionStatus.PREPARE)
+                    || transactionEntity.getStatus().equals(TransactionStatus.SUCCESS)) {
+                logger.warn("Complete Transaction API: Transaction Status Is " + transactionEntity.getStatus());
+                throw new TransactionStatusException();
+            }
+
+            cartItemService.emptyCartItem(currentUser);
+            transactionEntity.setStatus(TransactionStatus.SUCCESS);
+            transactionRepository.save(transactionEntity);
+            return new TransactionDetailData(transactionEntity);
+        }
+        catch(TransactionNotFoundException ex) {
+            logger.warn("Complete Transaction By Tid API: Transaction Not Found " + tid);
+            throw ex;
+        }
+    }
+
     public TransactionEntity findTransactionByUserAndTid(UserEntity userEntity, Integer tid) {
         TransactionEntity transactionEntity = transactionRepository.findTransactionByUserAndTid(userEntity, tid);
         if(transactionEntity == null) {

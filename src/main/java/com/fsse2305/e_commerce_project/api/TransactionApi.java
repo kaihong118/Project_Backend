@@ -39,4 +39,12 @@ public class TransactionApi {
         transactionService.updateTransactionStatusByTid(firebaseUserData, tid);
         return new TransactionStatusDto();
     }
+
+    @PatchMapping("/{tid}/finish")
+    public TransactionDetailDto completeTransactionByTid(JwtAuthenticationToken jwtToken,
+                                                             @PathVariable(value = "tid") Integer tid) {
+        FirebaseUserData firebaseUserData = JwtUtil.getFirebaseUserData(jwtToken);
+        TransactionDetailData transactionDetailData = transactionService.completeTransactionByTid(firebaseUserData, tid);
+        return new TransactionDetailDto(transactionDetailData);
+    }
 }
