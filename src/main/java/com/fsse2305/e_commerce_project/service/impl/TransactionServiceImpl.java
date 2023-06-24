@@ -1,13 +1,17 @@
 package com.fsse2305.e_commerce_project.service.impl;
 
 import com.fsse2305.e_commerce_project.data.cart_Item.entity.CartItemEntity;
+import com.fsse2305.e_commerce_project.data.transaction.TransactionStatus;
 import com.fsse2305.e_commerce_project.data.transaction.domainObject.TransactionDetailData;
 import com.fsse2305.e_commerce_project.data.transaction.entity.TransactionEntity;
 import com.fsse2305.e_commerce_project.data.transaction_product.entity.TransactionProductEntity;
 import com.fsse2305.e_commerce_project.data.user.domainObject.FirebaseUserData;
 import com.fsse2305.e_commerce_project.data.user.entity.UserEntity;
 import com.fsse2305.e_commerce_project.exception.cartItem.NoStockException;
+import com.fsse2305.e_commerce_project.exception.product.UpdateStockException;
 import com.fsse2305.e_commerce_project.exception.transaction.CreateTransactionException;
+import com.fsse2305.e_commerce_project.exception.transaction.TransactionNotFoundException;
+import com.fsse2305.e_commerce_project.exception.transaction.TransactionStatusException;
 import com.fsse2305.e_commerce_project.repository.TransactionRepository;
 import com.fsse2305.e_commerce_project.service.*;
 import org.slf4j.Logger;
@@ -67,6 +71,53 @@ public class TransactionServiceImpl implements TransactionService {
 
         transactionRepository.save(transactionEntity);
         return new TransactionDetailData(transactionEntity);
+    }
+
+    @Override
+    public TransactionDetailData getTransactionByTid(FirebaseUserData firebaseUserData, Integer tid) {
+        try {
+            UserEntity currentUser = getUserEntity(firebaseUserData);
+            TransactionEntity transactionEntity = findTransactionByUserAndTid(currentUser, tid);
+            return new TransactionDetailData(transactionEntity);
+        }
+        catch(TransactionNotFoundException ex) {
+            logger.warn("Get Transaction By Tid API: Transaction Not Found " + tid);
+            throw ex;
+        }
+    }
+
+    @Override
+    public TransactionDetailData updateTransactionStatusByTid(FirebaseUserData firebaseUserData, Integer tid) {
+        try {
+            UserEntity currentUser = getUserEntity(firebaseUserData);
+            TransactionEntity transactionEntity = findTransactionByUserAndTid(currentUser, tid);
+
+            if(transactionEntity.getStatus().equals(TransactionStatus.PROCESSING)
+                    || transactionEntity.getStatus().equals(TransactionStatus.SUCCESS)) {
+                logger.warn("Update Transaction API: Transaction Status Is " + transactionEntity.getStatus());
+                throw new TransactionStatusException();
+            }
+
+            productService.updateProductStock(transactionEntity);
+            transactionEntity.setStatus(TransactionStatus.PROCESSING);
+            return new TransactionDetailData(transactionRepository.save(transactionEntity));
+        }
+        catch(TransactionNotFoundException ex) {
+            logger.warn("Update Transaction By Tid API: Transaction Not Found " + tid);
+            throw ex;
+        }
+        catch(UpdateStockException ex) {
+            logger.warn("Update Transaction API: Stock Not Available");
+            throw ex;
+        }
+    }
+
+    public TransactionEntity findTransactionByUserAndTid(UserEntity userEntity, Integer tid) {
+        TransactionEntity transactionEntity = transactionRepository.findTransactionByUserAndTid(userEntity, tid);
+        if(transactionEntity == null) {
+            throw new TransactionNotFoundException();
+        }
+        return transactionEntity;
     }
 
     public UserEntity getUserEntity(FirebaseUserData firebaseUserData) {

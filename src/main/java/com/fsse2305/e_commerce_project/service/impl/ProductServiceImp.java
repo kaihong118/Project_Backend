@@ -2,7 +2,10 @@ package com.fsse2305.e_commerce_project.service.impl;
 
 import com.fsse2305.e_commerce_project.data.product.domainObject.ProductDetailData;
 import com.fsse2305.e_commerce_project.data.product.entity.ProductEntity;
+import com.fsse2305.e_commerce_project.data.transaction.entity.TransactionEntity;
+import com.fsse2305.e_commerce_project.data.transaction_product.entity.TransactionProductEntity;
 import com.fsse2305.e_commerce_project.exception.product.ProductNotFoundException;
+import com.fsse2305.e_commerce_project.exception.product.UpdateStockException;
 import com.fsse2305.e_commerce_project.repository.ProductRepository;
 import com.fsse2305.e_commerce_project.service.ProductService;
 import org.slf4j.Logger;
@@ -52,5 +55,14 @@ public class ProductServiceImp implements ProductService {
             throw new ProductNotFoundException();
         }
         return productEntity;
+    }
+
+    @Override
+    public void updateProductStock(TransactionEntity transactionEntity) {
+        for(TransactionProductEntity transactionProductEntity : transactionEntity.getTransactionProductEntityList()) {
+            if(!findProductByPid(transactionProductEntity.getPid()).setStockByTransaction(transactionProductEntity.getQuantity())) {
+                throw new UpdateStockException();
+            }
+        }
     }
 }

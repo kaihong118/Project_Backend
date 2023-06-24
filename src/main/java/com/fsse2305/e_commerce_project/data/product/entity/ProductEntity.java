@@ -75,4 +75,14 @@ public class ProductEntity {
     public void setStock(Integer stock) {
         this.stock = stock;
     }
+
+    public boolean setStockByTransaction(Integer quantity) {
+        if(this.stock - quantity >= 0) {
+            this.stock -= quantity;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
