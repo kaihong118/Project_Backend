@@ -142,7 +142,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public void emptyCartItem(UserEntity userEntity) {
+    public void emptyCartItemByUser(UserEntity userEntity) {
         cartItemRepository.deleteAll(findCartItemByUser(userEntity));
     }
 

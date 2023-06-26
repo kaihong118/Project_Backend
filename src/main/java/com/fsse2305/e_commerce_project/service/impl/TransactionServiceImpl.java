@@ -14,6 +14,7 @@ import com.fsse2305.e_commerce_project.exception.transaction.TransactionNotFound
 import com.fsse2305.e_commerce_project.exception.transaction.TransactionStatusException;
 import com.fsse2305.e_commerce_project.repository.TransactionRepository;
 import com.fsse2305.e_commerce_project.service.*;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public TransactionDetailData updateTransactionStatusByTid(FirebaseUserData firebaseUserData, Integer tid) {
         try {
             UserEntity currentUser = getUserEntity(firebaseUserData);
@@ -100,7 +102,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             productService.updateProductStock(transactionEntity);
             transactionEntity.setStatus(TransactionStatus.PROCESSING);
-            return new TransactionDetailData(transactionRepository.save(transactionEntity));
+            return new TransactionDetailData(transactionEntity);
         }
         catch(TransactionNotFoundException ex) {
             logger.warn("Update Transaction By Tid API: Transaction Not Found " + tid);
@@ -113,6 +115,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public TransactionDetailData completeTransactionByTid(FirebaseUserData firebaseUserData, Integer tid) {
         try {
             UserEntity currentUser = getUserEntity(firebaseUserData);
@@ -124,9 +127,8 @@ public class TransactionServiceImpl implements TransactionService {
                 throw new TransactionStatusException();
             }
 
-            cartItemService.emptyCartItem(currentUser);
+            cartItemService.emptyCartItemByUser(currentUser);
             transactionEntity.setStatus(TransactionStatus.SUCCESS);
-            transactionRepository.save(transactionEntity);
             return new TransactionDetailData(transactionEntity);
         }
         catch(TransactionNotFoundException ex) {

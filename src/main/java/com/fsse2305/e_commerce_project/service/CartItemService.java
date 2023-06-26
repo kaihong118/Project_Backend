@@ -23,5 +23,5 @@ public interface CartItemService {
 
     boolean checkStock(ProductEntity productEntity, Integer quantity);
 
-    void emptyCartItem(UserEntity userEntity);
+    void emptyCartItemByUser(UserEntity userEntity);
 }
