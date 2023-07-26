@@ -35,4 +35,14 @@ public class ProductApi {
     public ProductDetailDto getProductByPid(@PathVariable(value = "id") Integer pid) {
         return new ProductDetailDto(productService.getProductByPid(pid));
     }
+
+    @GetMapping("/search/{searchText}")
+    public List<AllProductDetailDto> getProductBySearchText(@PathVariable(value = "searchText") String searchText) {
+        List<AllProductDetailDto> productDetailDtoList = new ArrayList<>();
+
+        for(ProductDetailData productDetailData : productService.getProductBySearchText(searchText)) {
+            productDetailDtoList.add(new AllProductDetailDto(productDetailData));
+        }
+        return productDetailDtoList;
+    }
 }

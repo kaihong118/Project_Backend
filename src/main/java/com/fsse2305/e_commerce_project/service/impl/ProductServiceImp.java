@@ -48,6 +48,18 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
+    public List<ProductDetailData> getProductBySearchText(String searchText) {
+        List<ProductDetailData> productDetailDataList = new ArrayList<>();
+
+        for(ProductEntity productEntity : productRepository.findAll()) {
+            if(productEntity.getName().toLowerCase().contains(searchText.toLowerCase())) {
+                productDetailDataList.add(new ProductDetailData(productEntity));
+            }
+        }
+        return productDetailDataList;
+    }
+
+    @Override
     public ProductEntity findProductByPid(Integer pid) {
         ProductEntity productEntity = productRepository.findProductByPid(pid);
 

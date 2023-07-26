@@ -11,6 +11,8 @@ public interface ProductService {
 
     ProductDetailData getProductByPid(Integer pid);
 
+    List<ProductDetailData> getProductBySearchText(String searchText);
+
     ProductEntity findProductByPid(Integer pid);
 
     void updateProductStock(TransactionEntity transactionEntity);
