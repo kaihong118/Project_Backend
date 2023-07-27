@@ -1,5 +1,6 @@
 package com.fsse2305.e_commerce_project.api;
 
+import com.fsse2305.e_commerce_project.config.EnvConfig;
 import com.fsse2305.e_commerce_project.data.cart_Item.domainObject.CartItemDetailData;
 import com.fsse2305.e_commerce_project.data.cart_Item.dto.response.CartItemDetailResponseDto;
 import com.fsse2305.e_commerce_project.data.cart_Item.dto.response.CartItemStatusResponseDto;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/cart")
-@CrossOrigin(origins = "http://localhost:5173/")
+@CrossOrigin(origins = {EnvConfig.devConfig, EnvConfig.prodConfig})
 public class CartItemApi {
     private CartItemService cartItemService;
 

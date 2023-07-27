@@ -1,5 +1,6 @@
 package com.fsse2305.e_commerce_project.api;
 
+import com.fsse2305.e_commerce_project.config.EnvConfig;
 import com.fsse2305.e_commerce_project.data.transaction.domainObject.TransactionDetailData;
 import com.fsse2305.e_commerce_project.data.transaction.dto.TransactionDetailDto;
 import com.fsse2305.e_commerce_project.data.transaction.dto.TransactionStatusDto;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/transaction")
-@CrossOrigin(origins = "http://localhost:5173/")
+@CrossOrigin(origins = {EnvConfig.devConfig, EnvConfig.prodConfig})
 public class TransactionApi {
     private final TransactionService transactionService;
 
